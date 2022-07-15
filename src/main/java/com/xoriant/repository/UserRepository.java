@@ -11,5 +11,5 @@ import com.xoriant.entity.UserEntity;
 @Transactional
 public interface UserRepository extends JpaRepository<UserEntity, Long>, JpaSpecificationExecutor<UserEntity> {
 
-	UserEntity findByEmail(String email);
+	UserEntity findByUserName(String userName);
 }

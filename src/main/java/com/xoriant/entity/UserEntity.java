@@ -1,10 +1,16 @@
 package com.xoriant.entity;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.sun.istack.NotNull;
@@ -17,30 +23,40 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 @Entity
-@Table(name = "user_details")
+@Table(name = "USERS")
 public class UserEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "user_id")
 	private int id;
 
-	@Column(name = "first_name")
-	private String firstName;
-
-	@Column(name = "last_name")
-	private String lastName;
+	@Column(name = "displayname")
+	private String displayName;
 
 	@NotNull
-	@Column(name = "email")
-	private String email;
+	@Column(name = "username")
+	private String userName;
 
 	@NotNull
 	@Column(name = "password")
 	private String password;
 
-	public UserEntity(String firstName, String lastName, String email) {
-		this.firstName = firstName;
-		this.lastName = lastName;
+	@Column(name = "email")
+	private String email;
+
+	@Column(name = "mobilenumber")
+	private String mobileNumber;
+
+	@OneToMany(mappedBy = "user", cascade = { CascadeType.PERSIST, CascadeType.MERGE,
+			CascadeType.REFRESH }, orphanRemoval = true, fetch = FetchType.EAGER)
+	private Set<AccessMappingEntity> roleMapping = new HashSet<>();
+
+	public UserEntity(String displayName, String userName, String password, String email, String mobileNumber) {
+		this.displayName = displayName;
+		this.userName = userName;
+		this.password = password;
 		this.email = email;
+		this.mobileNumber = mobileNumber;
 	}
 }
