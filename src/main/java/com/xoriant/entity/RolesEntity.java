@@ -26,4 +26,7 @@ public class RolesEntity {
 	@Column(name = "rolename")
 	private String roleName;
 
+	public RolesEntity(String roleName) {
+		this.roleName = roleName;
+	}
 }

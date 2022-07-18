@@ -8,8 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.xoriant.entity.UserEntity;
-import com.xoriant.pojo.RolesPOJO;
+import com.xoriant.pojo.UserPOJO;
 import com.xoriant.service.UserService;
 
 @RestController
@@ -20,12 +19,8 @@ public class UserController {
 	private UserService userService;
 
 	@PostMapping("adduser")
-	public ResponseEntity<UserEntity> add(@RequestBody UserEntity user) {
+	public ResponseEntity<UserPOJO> add(@RequestBody UserPOJO user) {
 		return new ResponseEntity<>(userService.adduser(user), HttpStatus.CREATED);
 	}
 
-	@PostMapping("maproles")
-	public ResponseEntity<RolesPOJO> maproles(@RequestBody RolesPOJO rolespojo) {
-		return new ResponseEntity<>(userService.addroles(rolespojo), HttpStatus.CREATED);
-	}
 }
