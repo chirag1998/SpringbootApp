@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.xoriant.pojo.AuthenticatePOJO;
+import com.xoriant.pojo.AuthenticationResponsePOJO;
 import com.xoriant.service.AuthenticateService;
 
 @RestController
@@ -21,7 +22,8 @@ public class AuthenticationController {
 	private AuthenticateService authenticateService;
 
 	@PostMapping
-	public ResponseEntity<String> authenticateUser(@RequestBody AuthenticatePOJO request) throws Exception {
+	public ResponseEntity<AuthenticationResponsePOJO> authenticateUser(@RequestBody AuthenticatePOJO request)
+			throws Exception {
 		return new ResponseEntity<>(authenticateService.authenticateUser(request), HttpStatus.OK);
 	}
 

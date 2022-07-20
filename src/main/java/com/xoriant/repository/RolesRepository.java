@@ -11,7 +11,7 @@ import com.xoriant.entity.RolesEntity;
 
 @Repository
 @Transactional
-public interface RolesRepository extends JpaRepository<RolesEntity, Long>, JpaSpecificationExecutor<RolesEntity> {
+public interface RolesRepository extends JpaRepository<RolesEntity, Integer>, JpaSpecificationExecutor<RolesEntity> {
 
 	Optional<RolesEntity> findByRoleName(String roleName);
 }

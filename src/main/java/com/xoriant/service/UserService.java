@@ -1,7 +1,11 @@
 package com.xoriant.service;
 
+import java.util.Arrays;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.validation.Valid;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +16,8 @@ import com.xoriant.entity.AccessMappingEntity;
 import com.xoriant.entity.RolesEntity;
 import com.xoriant.entity.UserEntity;
 import com.xoriant.pojo.UserPOJO;
+import com.xoriant.pojo.UserRolesPOJO;
+import com.xoriant.pojo.UserUpdatePOJO;
 import com.xoriant.repository.RolesRepository;
 import com.xoriant.repository.UserRepository;
 
@@ -58,5 +64,56 @@ public class UserService {
 
 	private UserPOJO mapToPojo(UserEntity user) {
 		return modelMapper.map(user, UserPOJO.class);
+	}
+
+	public Optional<UserPOJO> updateuser(UserUpdatePOJO user) {
+		Optional<UserEntity> oldUser = userRepository.findById(user.getId());
+		if (oldUser.isPresent()) {
+			oldUser.get().setDisplayName(user.getDisplayName());
+			oldUser.get().setEmail(user.getEmail());
+			oldUser.get().setMobileNumber(user.getMobileNumber());
+			UserEntity response = userRepository.save(oldUser.get());
+			UserPOJO responseEntity = mapToPojo(response);
+			responseEntity.setRoles(getRoles(response.getRoleMapping()));
+			responseEntity.setPassword("");
+			return Optional.of(responseEntity);
+		} else {
+			return Optional.empty();
+		}
+	}
+
+	public Optional<UserPOJO> updateUserRoles(@Valid UserRolesPOJO user) {
+		UserPOJO request = modelMapper.map(user, UserPOJO.class);
+		Optional<UserEntity> oldUser = userRepository.findById((int) user.getId());
+		if (oldUser.isPresent()) {
+			updateRoles(oldUser.get(), request);
+			if (null != request.getRoles()) {
+				for (String role : request.getRoles()) {
+					Optional<RolesEntity> roleEntity = rolesRepository.findByRoleName(role);
+					if (roleEntity.isPresent()) {
+						AccessMappingEntity mapping = new AccessMappingEntity(oldUser.get(), roleEntity.get());
+						if (!oldUser.get().getRoleMapping().contains(mapping)) {
+							oldUser.get().getRoleMapping().add(mapping);
+						}
+					}
+				}
+			}
+			UserEntity response = userRepository.save(oldUser.get());
+			UserPOJO responseEntity = mapToPojo(response);
+			responseEntity.setRoles(getRoles(response.getRoleMapping()));
+			responseEntity.setPassword("");
+			return Optional.of(responseEntity);
+		} else {
+			return Optional.empty();
+		}
+	}
+
+	private void updateRoles(UserEntity user, UserPOJO request) {
+		if (user.getRoleMapping().size() > 0) {
+			user.getRoleMapping()
+					.removeAll(user.getRoleMapping().stream().filter(
+							stream -> !Arrays.asList(request.getRoles()).contains(stream.getRole().getRoleName()))
+							.collect(Collectors.toSet()));
+		}
 	}
 }

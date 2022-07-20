@@ -1,6 +1,7 @@
 package com.xoriant.service;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,8 +15,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.xoriant.entity.AccessMappingEntity;
 import com.xoriant.entity.UserEntity;
 import com.xoriant.pojo.AuthenticatePOJO;
+import com.xoriant.pojo.AuthenticationResponsePOJO;
 import com.xoriant.repository.UserRepository;
 import com.xoriant.util.JwtUtil;
 
@@ -31,13 +34,15 @@ public class AuthenticateService implements UserDetailsService {
 	@Autowired
 	private UserRepository userDao;
 
-	public String authenticateUser(AuthenticatePOJO request) throws Exception {
+	public AuthenticationResponsePOJO authenticateUser(AuthenticatePOJO request) throws Exception {
 		String userName = request.getUserName();
 
 		UserDetails userDetails = loadUserByUsername(userName);
 		String token = jwtUtil.generateToken(userDetails);
-
-		return token;
+		UserEntity authenticatedUser = userDao.findByUserName(userName);
+		AuthenticationResponsePOJO response = new AuthenticationResponsePOJO(token,
+				getRoles(authenticatedUser.getRoleMapping()));
+		return response;
 	}
 
 	public void authenticate(String userName, String userPassword) throws Exception {
@@ -67,5 +72,9 @@ public class AuthenticateService implements UserDetailsService {
 			System.out.println("User not found with username:{} " + username);
 			throw new UsernameNotFoundException("User not found with username: " + username);
 		}
+	}
+
+	public String[] getRoles(Set<AccessMappingEntity> role) {
+		return role.stream().map(mapper -> mapper.getRole().getRoleName()).toArray(String[]::new);
 	}
 }
