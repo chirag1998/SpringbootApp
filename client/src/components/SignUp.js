@@ -11,16 +11,44 @@ import Container from "@mui/material/Container";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import axios from "axios";
 import { useState } from "react";
-import { Alert } from "@mui/material";
-import { Link } from "react-router-dom";
+import {
+  Alert,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  OutlinedInput,
+  Select,
+} from "@mui/material";
 
 const theme = createTheme();
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+function getStyles(name, personName, theme) {
+  return {
+    fontWeight:
+      personName.indexOf(name) === -1
+        ? theme.typography.fontWeightRegular
+        : theme.typography.fontWeightMedium,
+  };
+}
 
 export default function SignUp() {
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
+  const userRoles = ["Admin", "Developer", "User"];
+  const [displayName, setDisplayName] = useState("");
+  const [userName, setUserName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [mobileNumber, setMobileNumber] = useState("");
+  const [roles, setRoles] = useState([]);
+
   const [isSubmit, setIsSubmit] = useState(false);
   const [formErrors, setFormErrors] = useState({});
 
@@ -29,12 +57,12 @@ export default function SignUp() {
   const validate = (values) => {
     let errors = {};
     const regex = /^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/i;
-    if (!values.firstName) {
-      console.log('here')
-      errors["firstName"] = "First Name is required";
+    if (!values.userName) {
+      console.log("here");
+      errors["userName"] = "First Name is required";
     }
-    if (!values.lastName) {
-      errors.lastName = "Last Name is required";
+    if (!values.displayName) {
+      errors.displayName = "Last Name is required";
     }
     if (!values.email) {
       errors.email = "Email is required";
@@ -46,6 +74,11 @@ export default function SignUp() {
     } else if (values.password < 6) {
       errors.password = "Password is too short";
     }
+    if (!values.mobileNumber) {
+      errors.mobileNumber = "Mobile no. is required";
+    } else if (values.mobileNumber < 10) {
+      errors.mobileNumber = "incorrect";
+    }
     return errors;
   };
 
@@ -54,39 +87,62 @@ export default function SignUp() {
   const handleSubmit = (e) => {
     e.preventDefault();
     let data = {
-      firstName,
-      lastName,
+      userName,
+      displayName,
       email,
-      password
+      password,
+      mobileNumber,
+      roles,
     };
-    let errorObj=validate(data)
-    setFormErrors(errorObj)
+    let errorObj = validate(data);
+    setFormErrors(errorObj);
 
     if (Object.keys(errorObj).length === 0) {
-      setIsSubmit(true);
+      console.log("asd", localStorage.getItem("accessToken"));
+      let lt= localStorage.getItem("accessToken");
+      
+      //data should be added as parameter after url not in "body:"
       axios
-        .post("http://localhost:8080/registration", data)
-        .then((response) => {})
+        .post("http://localhost:8080/registration/adduser", data,{
+          headers: {
+            Authorization: JSON.parse(lt)
+          }
+        }
+        )
+        .then((response) => {
+          if(response.status === 201)
+          {
+            setIsSubmit(true);
+          }
+        })
         .catch((error) => {
           console.error();
         });
     }
   };
+  const handleRolesChange = (event) => {
+    const {
+      target: { value },
+    } = event;
+    setRoles(
+      // On autofill we get a stringified value.
+      typeof value === "string" ? value.split(",") : value
+    );
+  };
 
   return (
     <ThemeProvider theme={theme}>
       <div>
-        {
-        Object.keys(formErrors).length === 0 && isSubmit ? (
+        {Object.keys(formErrors).length === 0 && isSubmit ? (
           <Alert
             severity="success"
             color="success"
             style={{ marginTop: "50px" }}
           >
-            Signed Up Successfully — Go to Login!
+            User Added Successfully !
           </Alert>
         ) : (
-         <p></p>
+          <p></p>
         )}
       </div>
       <Container component="main" maxWidth="xs">
@@ -103,7 +159,7 @@ export default function SignUp() {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign up
+            Add User
           </Typography>
           <Box
             component="form"
@@ -114,30 +170,30 @@ export default function SignUp() {
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
-                  autoComplete="given-name"
-                  name="firstName"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
+                  autoComplete="UserName"
+                  name="UserName"
+                  value={userName}
+                  onChange={(e) => setUserName(e.target.value)}
                   required
                   fullWidth
-                  id="firstName"
-                  label="First Name"
+                  id="UserName"
+                  label="UserName"
                   autoFocus
                 />
-                <p style={{ color: "red" }}>{formErrors.firstName}</p>
+                <p style={{ color: "red" }}>{formErrors.userName}</p>
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
                   required
                   fullWidth
-                  id="lastName"
-                  label="Last Name"
-                  name="lastName"
-                  autoComplete="family-name"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
+                  id="displayName"
+                  label="displayName"
+                  name="displayName"
+                  autoComplete="displayName"
+                  value={displayName}
+                  onChange={(e) => setDisplayName(e.target.value)}
                 />
-                <p style={{ color: "red" }}>{formErrors.lastName}</p>
+                <p style={{ color: "red" }}>{formErrors.displayName}</p>
               </Grid>
               <Grid item xs={12}>
                 <TextField
@@ -166,6 +222,44 @@ export default function SignUp() {
                 />
                 <p style={{ color: "red" }}>{formErrors.password}</p>
               </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  required
+                  fullWidth
+                  name="mobileNumber"
+                  label="Mobile Number"
+                  type="tel"
+                  id="mobileNumber"
+                  autoComplete="mobileNumber"
+                  value={mobileNumber}
+                  onChange={(e) => setMobileNumber(e.target.value)}
+                />
+                <p style={{ color: "red" }}>{formErrors.mobileNumber}</p>
+              </Grid>
+              <Grid item xs={12}>
+                <FormControl sx={{ m: 1, width: 300 }}>
+                  <InputLabel id="roles">Roles</InputLabel>
+                  <Select
+                    labelId="roles"
+                    id="roles"
+                    multiple
+                    value={roles}
+                    onChange={handleRolesChange}
+                    input={<OutlinedInput label="Roles" />}
+                    MenuProps={MenuProps}
+                  >
+                    {userRoles.map((name) => (
+                      <MenuItem
+                        key={name}
+                        value={name}
+                        style={getStyles(name, roles, theme)}
+                      >
+                        {name}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
             </Grid>
             <Button
               type="submit"
@@ -173,16 +267,8 @@ export default function SignUp() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign Up
+              Add User
             </Button>
-            <Grid container justifyContent="flex-end">
-              <Grid item>
-                <span>Already have an account? </span>
-                <Link to="/" variant="body2" style={{textDecoration:"none",fontWeight:"bold"}}>
-                   Sign in
-                </Link>
-              </Grid>
-            </Grid>
           </Box>
         </Box>
       </Container>

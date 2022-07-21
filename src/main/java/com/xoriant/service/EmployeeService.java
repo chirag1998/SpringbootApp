@@ -1,6 +1,8 @@
 package com.xoriant.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.xoriant.entity.EmployeeEntity;
@@ -15,6 +17,12 @@ public class EmployeeService {
 
 	public Object getUsers() {
 		return employeeRepo.findAll();
+	}
+	
+	public Page<EmployeeEntity> getpagelist(Pageable pageable){
+		return employeeRepo.findAll(pageable);
+		 
+		
 	}
 
 	public void deleteById(long id) {

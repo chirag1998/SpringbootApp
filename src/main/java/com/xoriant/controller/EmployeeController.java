@@ -1,6 +1,9 @@
 package com.xoriant.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -15,36 +18,50 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.xoriant.entity.EmployeeEntity;
 import com.xoriant.service.EmployeeService;
+import com.xoriant.service.UserService;
 
+//@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping()
 @CrossOrigin(origins = "http://localhost:3000")
 public class EmployeeController {
-
+	
 	@Autowired
 	private EmployeeService employeeService;
-
+	
 	@PostMapping("/addemployee")
 	public ResponseEntity<EmployeeEntity> addEmployee(@RequestBody EmployeeEntity employee) {
 		return new ResponseEntity<>(employeeService.adduser(employee), HttpStatus.CREATED);
 	}
-
+	
 	@GetMapping("/listemployee")
 	public ResponseEntity<?> getDataList() {
-		return new ResponseEntity<>(employeeService.getUsers(), HttpStatus.OK);
+		return new ResponseEntity<>(employeeService.getUsers(), HttpStatus.OK);	
 	}
-
+	
 	@DeleteMapping("delete/{id}")
 	public ResponseEntity<?> delete(@PathVariable("id") long id) {
 		employeeService.deleteById(id);
 		return new ResponseEntity<>("Employee Deleted successfully", HttpStatus.ACCEPTED);
-
+		
 	}
-
+	
 	@PutMapping("update/{id}")
-	public ResponseEntity<?> update(@PathVariable("id") long id, @RequestBody EmployeeEntity emp) {
-		// boolean result = employeeService.updateEmployee(id, emp);
-		return new ResponseEntity<>(employeeService.updateEmployee(id, emp), HttpStatus.OK);
+	public ResponseEntity<?> update(@PathVariable("id") long id,
+			@RequestBody EmployeeEntity emp) {
+		//boolean result = employeeService.updateEmployee(id, emp);
+		return new ResponseEntity<>(employeeService.updateEmployee(id,emp), HttpStatus.OK);
+	}
+	
+	@GetMapping("pagablelist/{page}")
+	public ResponseEntity<?> pagablelist(@PathVariable("page") int page) {
+		Pageable of = PageRequest.of(page, 5);
+		Page<EmployeeEntity> empPageList = employeeService.getpagelist(of);
+		for(EmployeeEntity e : empPageList) {
+			System.out.println("emp "+ e);
+		}
+		return new ResponseEntity<>(empPageList, HttpStatus.OK);
+		
 	}
 
 }

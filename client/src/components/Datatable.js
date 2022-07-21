@@ -1,12 +1,12 @@
 import * as React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
-import { Button, Grid, IconButton } from '@mui/material';
+import { Button, Grid, IconButton, TextField } from '@mui/material';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
 import AddDialog from './AddDialog';
 import CustomSnackbar from './CustomSnackbar';
-//const [data1, setData1] = React.useState("");
+
 const DATA_LIST_URL = "http://localhost:8080/";
 const ADD_DATA = "http://localhost:8080/addemployee";
 const initialValue = { firstName: "", lastName: "", email: "", date: "" }
@@ -138,32 +138,66 @@ export default function DataTable() {
   ];
 
   function refetch() {
-    axios.get(DATA_LIST_URL + 'listemployee')
-      .then(resp => {
-        //console.log(resp.data[0])
-        setData(resp.data)
-      })
+    // axios.get(DATA_LIST_URL + 'listemployee')
+    //   .then(resp => {
+    //     console.log(resp.data)
+    //     setData(resp.data)
+    //   })
+    fetchData();
   }
 
-  React.useEffect(() => {
-    axios.get(DATA_LIST_URL + 'listemployee')
-      .then(resp => {
-        //console.log(resp.data[0])
-        setData(resp.data)
-      })
-  }, [])
+  // React.useEffect(() => {
+  //   axios.get(DATA_LIST_URL + 'pagablelist/'+page)
+  //     .then(resp => {
+  //       console.log(resp.data.content)
+  //       setTotal(resp.data.totalElements)
+  //       setData(resp.data)
+  //     })
+  // }, [])
+  const [page, setPage] = React.useState(0);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [pageSize, setPageSize] = React.useState([6]);
+  const [total, setTotal] = React.useState(0);
+
+  React.useEffect(()=>{
+    fetchData();
+  },[page])
+
+  const fetchData = async () =>{
+    setIsLoading(true);
+    const response = await axios.get(DATA_LIST_URL+'pagablelist/'+page)
+    console.log(response.data.content);
+    setData(response.data.content)
+    setTotal(response.data.totalElements);
+    console.log(response.data.totalElements)
+    setIsLoading(false);
+  }
 
   return (
     <>
-      <Grid align="right" sx={{ pb: "10px" }}><Button variant='outlined' onClick={handleClickOpen}>ADD EMPLOYEE</Button></Grid>
+      
+      <Grid align="right" sx={{ pb: "10px" }}>
+        <TextField size='small' variant='standard' label="Search" color='primary' sx={{mr : '20px', mt:'-8px'}}></TextField>
+        <Button variant='outlined' onClick={handleClickOpen}>ADD EMPLOYEE</Button>
+      </Grid>
       <AddDialog open1={open1} handleClose={handleClose} data={formData} onChange={onChange}
         handleFormSubmit={handleFormSubmit} />
-      <div style={{ height: 450, width: '100%' }}>
+      <div style={{ height: 425, width: '100%' }}>
         <DataGrid
           rows={data}
           columns={columns}
-          pageSize={6}
+          rowCount={total}
+          loading = {isLoading}
           rowsPerPageOptions={[6]}
+          pagination
+          page = {page}
+          pageSize={pageSize}
+          paginationMode="server"
+          onPageChange={(newPage) => {
+            setPage(newPage)
+            //console.log(newPage);
+          }}
+          onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
           checkboxSelection
           sx={{ pl: '24px' }}
           disableColumnMenu

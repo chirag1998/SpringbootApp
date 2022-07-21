@@ -16,51 +16,52 @@ import axios from "axios";
 const theme = createTheme();
 
 export default function SignIn() {
-  const [emailid, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [emailidError, setEmailidError] = useState(false);
-  const [passwordError, setPasswordError] = useState(false);
+  const [userName, setEmail] = useState("");
+  const [userPassword, setuserPassword] = useState("");
+  const [userNameError, setuserNameError] = useState(false);
+  const [userPasswordError, setuserPasswordError] = useState(false);
 
   let navigate = useNavigate();
 
   // React.useEffect(() => {
-  //   emailid.trim().length === 0
-  //     ? setEmailidError(true)
-  //     : setEmailidError(false);
-  // }, [emailid]);
-
- 
+  //   userName.trim().length === 0
+  //     ? setuserNameError(true)
+  //     : setuserNameError(false);
+  // }, [userName]);
 
   const handleSubmit = (event) => {
-
     event.preventDefault();
     let emailError = false;
     let passError = false;
 
-    emailError = emailid.trim().length === 0 ? true : false;
-    passError = password.trim().length === 0 ? true : false;
+    emailError = userName.trim().length === 0 ? true : false;
+    passError = userPassword.trim().length === 0 ? true : false;
 
     let er = false;
 
     if (emailError || passError) er = true;
     else er = false;
 
-    emailError && setEmailidError (true)
-    passError && setPasswordError (true)
-
+    emailError && setuserNameError(true);
+    passError && setuserPasswordError(true);
 
     if (!er) {
       let data = {
-        emailid,
-        password,
+        userName,
+        userPassword,
       };
 
       axios
-        .post("http://localhost:8080/login", data)
+        .post("http://localhost:8080/authenticate", data)
         .then((response) => {
-          if (response.status === 200) {
-            navigate("dashboard");
-          }
+          // if (response.status === 200) {
+          console.log(response.data, " response");
+          localStorage.setItem(
+            "accessToken",
+            JSON.stringify("LoginToken " + response?.data?.jwtToken)
+          );
+          navigate("/signup");
+          // }
         })
         .catch((error) => {
           console.error();
@@ -96,41 +97,41 @@ export default function SignIn() {
               margin="normal"
               required
               fullWidth
-              id="email"
-              label="Email Address"
+              id="Username"
+              label="Username"
               name="email"
-              autoComplete="email"
-              value={emailid}
+              autoComplete="Username"
+              value={userName}
               onChange={(e) => {
                 setEmail(e.target.value);
-                setEmailidError(false);
+                setuserNameError(false);
               }}
               onBlur={(e) => {
-                if (!e.target.value) setEmailidError(true);
+                if (!e.target.value) setuserNameError(true);
               }}
               autoFocus
-              error={emailidError}
-              helperText={"enter email"}
+              error={userNameError}
+              helperText={"enter Username"}
             />
             <TextField
               margin="normal"
               required
               fullWidth
-              name="password"
-              label="Password"
+              name="userPassword"
+              label="userPassword"
               type="password"
-              id="password"
-              value={password}
+              id="userPassword"
+              value={userPassword}
               onChange={(e) => {
-                setPassword(e.target.value);
-                setPasswordError(false);
+                setuserPassword(e.target.value);
+                setuserPasswordError(false);
               }}
               onBlur={(e) => {
-                if (!e.target.value) setPasswordError(true);
+                if (!e.target.value) setuserPasswordError(true);
               }}
-              autoComplete="current-password"
-              error={passwordError}
-              helperText={"enter password"}
+              autoComplete="current-userPassword"
+              error={userPasswordError}
+              helperText={"enter userPassword"}
             />
             <Button
               type="submit"
@@ -147,12 +148,12 @@ export default function SignIn() {
                   variant="body2"
                   style={{ textDecoration: "none", fontWeight: "bold" }}
                 >
-                  Forgot password?
+                  Forgot userPassword?
                 </Link>
               </Grid>
               <Grid item>
                 <Link
-                  to="/#"
+                  to="/signup"
                   variant="body2"
                   style={{ textDecoration: "none", fontWeight: "bold" }}
                 >
