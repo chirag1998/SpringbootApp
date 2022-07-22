@@ -1,5 +1,7 @@
 package com.xoriant.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -52,6 +54,12 @@ public class EmployeeService {
 		}
 		
 		return employeeRepo.save(employee);
+	}
+
+	public List<EmployeeEntity> searchEmployee(String searchterm) {
+		List<EmployeeEntity> searchlist= employeeRepo.findByFirstName(searchterm);
+		return searchlist;
+		
 	}
 
 }

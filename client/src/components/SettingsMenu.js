@@ -36,7 +36,7 @@ export default function SettingsMenu() {
           'aria-labelledby': 'basic-button',
         }}
       >
-        <MenuItem onClick={() => navigate('/sign-up')} >Sign Up</MenuItem>
+        <MenuItem onClick={() => navigate('/signup')} >Sign Up</MenuItem>
         {/* <MenuItem onClick={handleClose}>My account</MenuItem>
         <MenuItem onClick={handleClose}>Logout</MenuItem> */}
       </Menu>

@@ -1,5 +1,7 @@
 package com.xoriant.controller;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,12 +20,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.xoriant.entity.EmployeeEntity;
 import com.xoriant.service.EmployeeService;
-import com.xoriant.service.UserService;
 
 //@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping()
-@CrossOrigin(origins = "http://localhost:3000")
 public class EmployeeController {
 	
 	@Autowired
@@ -55,13 +55,22 @@ public class EmployeeController {
 	
 	@GetMapping("pagablelist/{page}")
 	public ResponseEntity<?> pagablelist(@PathVariable("page") int page) {
-		Pageable of = PageRequest.of(page, 5);
+		Pageable of = PageRequest.of(page, 6);
 		Page<EmployeeEntity> empPageList = employeeService.getpagelist(of);
-		for(EmployeeEntity e : empPageList) {
-			System.out.println("emp "+ e);
-		}
 		return new ResponseEntity<>(empPageList, HttpStatus.OK);
 		
+	}
+	
+	@GetMapping("search/{searchterm}")
+	public ResponseEntity<?> searchQuery(@PathVariable("searchterm") String searchterm){
+		System.out.println(searchterm);
+		List<EmployeeEntity> searchList =  employeeService.searchEmployee(searchterm);
+		if(searchList.size() > 0)
+			return new ResponseEntity<>(searchList, HttpStatus.ACCEPTED);
+		else {
+			
+			return new ResponseEntity<>("Employee Not Found",HttpStatus.NOT_FOUND);
+		}
 	}
 
 }

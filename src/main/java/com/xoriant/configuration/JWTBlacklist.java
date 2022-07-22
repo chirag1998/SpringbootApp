@@ -6,12 +6,10 @@ import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
 import com.xoriant.util.JwtUtil;
 
 @Component
-@CrossOrigin(origins = "http://localhost:3000")
 public class JWTBlacklist {
 
 	@Autowired

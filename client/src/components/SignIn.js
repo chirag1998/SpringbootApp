@@ -55,12 +55,12 @@ export default function SignIn() {
         .post("http://localhost:8080/authenticate", data)
         .then((response) => {
           // if (response.status === 200) {
-          console.log(response.data, " response");
+          //console.log(response.data, " response");
           localStorage.setItem(
             "accessToken",
             JSON.stringify("LoginToken " + response?.data?.jwtToken)
           );
-          navigate("/signup");
+          navigate("/dashboard");
           // }
         })
         .catch((error) => {

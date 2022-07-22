@@ -6,6 +6,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import axios from 'axios';
 import AddDialog from './AddDialog';
 import CustomSnackbar from './CustomSnackbar';
+import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 
 const DATA_LIST_URL = "http://localhost:8080/";
 const ADD_DATA = "http://localhost:8080/addemployee";
@@ -19,18 +20,61 @@ export default function DataTable() {
   const [smessage, setSmessage] = React.useState("");
   const [serror, setSerror] = React.useState("");
   const [formData, setFormData] = React.useState(initialValue)
+  const [page, setPage] = React.useState(0);
+  const [isLoading, setIsLoading] = React.useState(false);
+  const [pageSize, setPageSize] = React.useState(6);
+  const [total, setTotal] = React.useState(0);
+  const [searchTerm, SetSearchTerm] = React.useState('');
+
+
+  const columns = [
+    { field: 'id', headerName: 'ID', width: 70 },
+    { field: 'firstName', headerName: 'First name', width: 120 },
+    { field: 'lastName', headerName: 'Last name', width: 120 },
+    {
+      field: 'email', headerName: 'E-Mail', width: 250,
+    },
+    {
+      field: 'date', headerName: 'Date', width: 120,
+
+    },
+    {
+      field: 'edit', headerName: 'Edit', sortable: false,
+      renderCell: (cellValues) => {
+        return (
+          <IconButton
+            onClick={() => handleClick(cellValues.row)}><EditIcon /></IconButton>
+          //<FormDialog />
+        );
+      },
+      width: 100
+    },
+    {
+      field: 'delete', headerName: 'Delete', sortable: false,
+      renderCell: (cellValues) => {
+        return (
+          <IconButton
+            onClick={() => handleDelete(cellValues.id)}><DeleteIcon /></IconButton>
+        );
+      }
+    },
+
+  ];
 
   const onChange = (e) => {
     const { value, id } = e.target
-    //console.log(e);
     setFormData({ ...formData, [id]: value })
   }
 
   const handleFormSubmit = () => {
+
+    let lt= localStorage.getItem("accessToken");
     if (formData.id) {
-      //console.log("input ", formData.id)
-      //let id = formData.id;
-      axios.put(DATA_LIST_URL + 'update/' + formData.id, formData)
+      axios.put(DATA_LIST_URL + 'update/' + formData.id, formData,{
+        headers: {
+          Authorization: JSON.parse(lt)
+        }
+      })
         .then(resp => {console.log(resp.status)
           if(resp.status === 200){
             setSopen(true);
@@ -47,13 +91,14 @@ export default function DataTable() {
             setSerror("error");
             handleClose();
         })
-      
-      //setData(data.filter(data => data.id !== id));
       setFormData(initialValue);
     }
     else {
-      axios.post(ADD_DATA, formData)
-        //.then(resp => resp.json())
+      axios.post(ADD_DATA, formData,{
+        headers: {
+        Authorization: JSON.parse(lt)
+        }
+      })
         .then(resp => {console.log(resp.status)
         if(resp.status === 201){
             setSopen(true);
@@ -92,92 +137,93 @@ export default function DataTable() {
   };
 
   const handleDelete = (id) => {
-    axios.delete(DATA_LIST_URL + 'delete/' + id)
+    let lt= localStorage.getItem("accessToken");
+    axios.delete(DATA_LIST_URL + 'delete/' + id,{
+      headers: {
+        Authorization: JSON.parse(lt)
+      }
+    })
       .then(resp => console.log(resp))
+      .catch((error)=>{
+        console.log(error)
+        setSopen(true);
+        setSmessage("Not able to Delete");
+        setSerror("error");
+      })
 
     setData(data.filter(data => data.id !== id));
   }
 
   const handleClick = (cellValues) => {
-    console.log(cellValues)
     setFormData(cellValues);
     handleClickOpen();
   }
 
-  const columns = [
-    { field: 'id', headerName: 'ID', width: 70 },
-    { field: 'firstName', headerName: 'First name', width: 120 },
-    { field: 'lastName', headerName: 'Last name', width: 120 },
-    {
-      field: 'email', headerName: 'E-Mail', width: 250,
-    },
-    {
-      field: 'date', headerName: 'Date', width: 120,
-    },
-    {
-      field: 'edit', headerName: 'Edit', sortable: false,
-      renderCell: (cellValues) => {
-        return (
-          <IconButton
-            onClick={() => handleClick(cellValues.row)}><EditIcon /></IconButton>
-          //<FormDialog />
-        );
-      },
-      width: 100
-    },
-    {
-      field: 'delete', headerName: 'Delete', sortable: false,
-      renderCell: (cellValues) => {
-        return (
-          <IconButton
-            onClick={() => handleDelete(cellValues.id)}><DeleteIcon /></IconButton>
-        );
-      }
-    },
-
-  ];
-
   function refetch() {
-    // axios.get(DATA_LIST_URL + 'listemployee')
-    //   .then(resp => {
-    //     console.log(resp.data)
-    //     setData(resp.data)
-    //   })
     fetchData();
   }
-
-  // React.useEffect(() => {
-  //   axios.get(DATA_LIST_URL + 'pagablelist/'+page)
-  //     .then(resp => {
-  //       console.log(resp.data.content)
-  //       setTotal(resp.data.totalElements)
-  //       setData(resp.data)
-  //     })
-  // }, [])
-  const [page, setPage] = React.useState(0);
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [pageSize, setPageSize] = React.useState([6]);
-  const [total, setTotal] = React.useState(0);
 
   React.useEffect(()=>{
     fetchData();
   },[page])
 
   const fetchData = async () =>{
+    try{
+    let lt= localStorage.getItem("accessToken");
     setIsLoading(true);
-    const response = await axios.get(DATA_LIST_URL+'pagablelist/'+page)
-    console.log(response.data.content);
+    const response = await axios.get(DATA_LIST_URL+'pagablelist/'+page,{
+      headers: {
+        Authorization: JSON.parse(lt)
+      }
+    })
+    console.log(response.data);
     setData(response.data.content)
     setTotal(response.data.totalElements);
-    console.log(response.data.totalElements)
     setIsLoading(false);
+  }catch(error){
+    console.log(error)
+    setSopen(true);
+    setSmessage("Not able to Fetch Data");
+    setSerror("error");
+  }
+  }
+
+  const handleSearch = async(event) => {
+    SetSearchTerm(event.target.value);
+  }
+
+  const handleSearchClick = async () => {
+    try{
+    console.log(searchTerm)
+    let lt= localStorage.getItem("accessToken");
+    const response  = await axios.get(DATA_LIST_URL+'search/'+searchTerm,{
+      headers: {
+        Authorization: JSON.parse(lt)
+      }
+    })
+    console.log(response);
+    setData(response.data)
+  }catch(error){
+    console.log(error)
+    setSopen(true);
+    setSmessage("Data Not Found");
+    setSerror("error");
+  }
+  }
+
+  const handleBlur = (event) => {
+    if(event.target.value === ''){
+      refetch();
+    }
   }
 
   return (
     <>
-      
       <Grid align="right" sx={{ pb: "10px" }}>
-        <TextField size='small' variant='standard' label="Search" color='primary' sx={{mr : '20px', mt:'-8px'}}></TextField>
+        <TextField size='small' variant='standard' label="Search" color='primary' sx={{mr : '20px', mt:'-8px'}}
+        onChange ={(event)=>handleSearch(event)}
+        onBlur = {(event) => handleBlur(event)}></TextField>
+        <IconButton sx={{ml:'-50px'}}><PersonSearchIcon onClick={handleSearchClick}/></IconButton>
         <Button variant='outlined' onClick={handleClickOpen}>ADD EMPLOYEE</Button>
       </Grid>
       <AddDialog open1={open1} handleClose={handleClose} data={formData} onChange={onChange}
@@ -188,7 +234,7 @@ export default function DataTable() {
           columns={columns}
           rowCount={total}
           loading = {isLoading}
-          rowsPerPageOptions={[6]}
+          rowsPerPageOptions={[6, 10, 20]}
           pagination
           page = {page}
           pageSize={pageSize}

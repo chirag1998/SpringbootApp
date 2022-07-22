@@ -20,6 +20,8 @@ import {
   Select,
 } from "@mui/material";
 
+const ADD_USER = "http://localhost:8080/registration/adduser";
+
 const theme = createTheme();
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -103,7 +105,7 @@ export default function SignUp() {
       
       //data should be added as parameter after url not in "body:"
       axios
-        .post("http://localhost:8080/registration/adduser", data,{
+        .post(ADD_USER, data,{
           headers: {
             Authorization: JSON.parse(lt)
           }

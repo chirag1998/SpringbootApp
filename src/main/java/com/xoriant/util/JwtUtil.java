@@ -8,14 +8,12 @@ import java.util.function.Function;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.CrossOrigin;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 @Component
-@CrossOrigin(origins = "http://localhost:3000")
 public class JwtUtil implements Serializable {
 
 	private static final long serialVersionUID = -2550185165626007488L;

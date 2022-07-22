@@ -13,17 +13,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.xoriant.service.AuthenticateService;
 import com.xoriant.util.JwtUtil;
 
-import ch.qos.logback.classic.Logger;
 import io.jsonwebtoken.ExpiredJwtException;
 
 @Component
-@CrossOrigin(origins = "http://localhost:3000")
 public class RbacRequestFilter extends OncePerRequestFilter {
 
 	@Autowired
