@@ -1,9 +1,6 @@
 package com.xoriant.entity;
 
-
-
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -31,7 +28,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "EMPLOYEES")
 public class EmployeeEntity {
-	
+
 	public EmployeeEntity(String firstName2, String lastName2, String email2, LocalDate date2) {
 		this.firstName = firstName2;
 		this.lastName = lastName2;
@@ -57,10 +54,7 @@ public class EmployeeEntity {
 	@Column(name = "date_of_birth")
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	@JsonDeserialize(using = LocalDateDeserializer.class)
-    @JsonSerialize(using = LocalDateSerializer.class)
-	private LocalDate date; 
-//	{
-//	    "myDateTime": "2018-12-10T13:45:00.000Z"
-//	}
+	@JsonSerialize(using = LocalDateSerializer.class)
+	private LocalDate date;
 
 }

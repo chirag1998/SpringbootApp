@@ -1,6 +1,8 @@
 package com.xoriant.service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -116,4 +118,16 @@ public class UserService {
 							.collect(Collectors.toSet()));
 		}
 	}
+
+	public List<UserPOJO> findAll() {
+		List<UserPOJO> users = new ArrayList<>();
+		userRepository.findAll().stream().forEach(result -> {
+			UserPOJO responseEntity = mapToPojo(result);
+			responseEntity.setRoles(getRoles(result.getRoleMapping()));
+			responseEntity.setPassword("");
+			users.add(responseEntity);
+		});
+		return users;
+	}
+
 }
