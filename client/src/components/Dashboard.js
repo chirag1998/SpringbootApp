@@ -14,11 +14,12 @@ import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import MenuIcon from '@mui/icons-material/Menu';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import { mainListItems} from './listItems';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 // import { useNavigate } from 'react-router-dom';
 import DataTable from './Datatable';
 import SettingsMenu from './SettingsMenu';
+import { useLocation } from 'react-router-dom';
+import Listitems1 from './Listitems1';
 
 
 const drawerWidth = 240;
@@ -70,13 +71,21 @@ const Drawer = styled(MuiDrawer, { shouldForwardProp: (prop) => prop !== 'open' 
 const mdTheme = createTheme();
 
 function DashboardContent() {
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = React.useState(false);
+  const [roles, setroles] = React.useState([]);
   //const [open1, setOpen1] = React.useState(false);
   //const [formData, setFormData] = React.useState({firstName: "", lastName: "",email:"", date:""})
   const toggleDrawer = () => {
     setOpen(!open);
   };
   //let navigate = useNavigate();
+  const location = useLocation();
+
+  React.useEffect(() => {
+    setroles(location.state.roles)
+    //console.log(location.state.roles,"roles");
+  },)
+  
 
   return (
     <ThemeProvider theme={mdTheme}>
@@ -109,6 +118,7 @@ function DashboardContent() {
               sx={{ flexGrow: 1 }}
             >
               Dashboard
+              {/* {location.state.roles} */}
             </Typography>
             {/* <IconButton color = "inherit" onClick={() => navigate('update-employee')}>
                 <SettingsIcon />
@@ -134,7 +144,8 @@ function DashboardContent() {
           </Toolbar>
           <Divider />
           <List component="nav">
-            {mainListItems}
+            {/* {mainListItems} */}
+            <Listitems1 roles={roles}/>
             <Divider sx={{ my: 1 }} />
           </List>
         </Drawer>

@@ -76,6 +76,18 @@ public class EmployeeController {
 			return new ResponseEntity<>("Employee Not Found", HttpStatus.NOT_FOUND);
 		}
 	}
+	
+	@GetMapping("likesearch/{searchterm}")
+	public ResponseEntity<?> searchLike(@PathVariable("searchterm") String searchTerm){
+		List<EmployeeEntity> searchList = employeeService.searchEmployeeLike(searchTerm);
+		if(searchList.size()> 0) {
+			return new ResponseEntity<>(searchList, HttpStatus.ACCEPTED);
+		}
+		else {
+			return new ResponseEntity<>("Employee Not Found",HttpStatus.NOT_FOUND);
+		}
+		
+	}
 
 	@GetMapping("exportpdf/{page}")
 	public void exportToPDF(@PathVariable("page") int page, HttpServletResponse response)

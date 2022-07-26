@@ -61,5 +61,10 @@ public class EmployeeService {
 		return searchlist;
 		
 	}
+	
+	public List<EmployeeEntity> searchEmployeeLike(String query){
+		List<EmployeeEntity> list = employeeRepo.searchEmployee(query);
+		return list;
+	}
 
 }

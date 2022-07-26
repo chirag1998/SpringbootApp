@@ -102,7 +102,7 @@ export default function DataTable() {
         .then(resp => {console.log(resp.status)
         if(resp.status === 201){
             setSopen(true);
-            setSmessage("Updated Successfully");
+            setSmessage("Added Successfully");
             setSerror("success");
             handleClose();
             refetch();
@@ -196,7 +196,7 @@ export default function DataTable() {
     try{
     console.log(searchTerm)
     let lt= localStorage.getItem("accessToken");
-    const response  = await axios.get(DATA_LIST_URL+'search/'+searchTerm,{
+    const response  = await axios.get(DATA_LIST_URL+'likesearch/'+searchTerm,{
       headers: {
         Authorization: JSON.parse(lt)
       }
