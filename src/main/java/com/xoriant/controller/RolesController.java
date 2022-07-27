@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.xoriant.entity.RolesEntity;
+import com.xoriant.pojo.RolesPOJO;
 import com.xoriant.service.RolesService;
 
 @RestController
@@ -19,7 +19,7 @@ public class RolesController {
 	private RolesService rolesService;
 
 	@PostMapping("addrole")
-	public ResponseEntity<RolesEntity> add(@RequestBody RolesEntity roles) {
+	public ResponseEntity<?> add(@RequestBody RolesPOJO roles) {
 		return new ResponseEntity<>(rolesService.addroles(roles), HttpStatus.CREATED);
 	}
 

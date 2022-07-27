@@ -1,5 +1,6 @@
 package com.xoriant.service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -11,6 +12,8 @@ import javax.validation.Valid;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -43,8 +46,10 @@ public class UserService {
 	}
 
 	public UserPOJO adduser(UserPOJO user) {
-		UserEntity userdetails = new UserEntity(user.getDisplayName(), user.getUserName(),
-				getEncodedPassword(user.getPassword()), user.getEmail(), user.getMobileNumber());
+		String loggeduser = userName();
+		UserEntity userdetails = new UserEntity(loggeduser, LocalDateTime.now(), loggeduser, LocalDateTime.now(),
+				user.getDisplayName(), user.getUserName(), getEncodedPassword(user.getPassword()), user.getEmail(),
+				user.getMobileNumber());
 		if (null != user.getRoles()) {
 			for (String role : user.getRoles()) {
 				Optional<RolesEntity> roleEntity = rolesRepository.findByRoleName(role);
@@ -70,7 +75,10 @@ public class UserService {
 
 	public Optional<UserPOJO> updateuser(UserUpdatePOJO user) {
 		Optional<UserEntity> oldUser = userRepository.findById(user.getId());
+		String loggedInUser = userName();
 		if (oldUser.isPresent()) {
+			oldUser.get().setLastUpdatedBy(loggedInUser);
+			oldUser.get().setLastUpdateDate(LocalDateTime.now());
 			oldUser.get().setDisplayName(user.getDisplayName());
 			oldUser.get().setEmail(user.getEmail());
 			oldUser.get().setMobileNumber(user.getMobileNumber());
@@ -128,6 +136,10 @@ public class UserService {
 			users.add(responseEntity);
 		});
 		return users;
+	}
+
+	public String userName() {
+		return ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
 	}
 
 }

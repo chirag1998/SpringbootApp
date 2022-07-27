@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.lowagie.text.DocumentException;
 import com.xoriant.entity.EmployeeEntity;
+import com.xoriant.pojo.EmployeePOJO;
 import com.xoriant.service.EmployeeService;
 import com.xoriant.util.EmployeePdfExporterUtil;
 
@@ -36,7 +37,7 @@ public class EmployeeController {
 	private EmployeeService employeeService;
 
 	@PostMapping("/addemployee")
-	public ResponseEntity<EmployeeEntity> addEmployee(@RequestBody EmployeeEntity employee) {
+	public ResponseEntity<?> addEmployee(@RequestBody EmployeePOJO employee) {
 		return new ResponseEntity<>(employeeService.adduser(employee), HttpStatus.CREATED);
 	}
 
@@ -53,7 +54,7 @@ public class EmployeeController {
 	}
 
 	@PutMapping("update/{id}")
-	public ResponseEntity<?> update(@PathVariable("id") long id, @RequestBody EmployeeEntity emp) {
+	public ResponseEntity<?> update(@PathVariable("id") long id, @RequestBody EmployeePOJO emp) {
 		return new ResponseEntity<>(employeeService.updateEmployee(id, emp), HttpStatus.OK);
 	}
 
@@ -76,17 +77,16 @@ public class EmployeeController {
 			return new ResponseEntity<>("Employee Not Found", HttpStatus.NOT_FOUND);
 		}
 	}
-	
+
 	@GetMapping("likesearch/{searchterm}")
-	public ResponseEntity<?> searchLike(@PathVariable("searchterm") String searchTerm){
+	public ResponseEntity<?> searchLike(@PathVariable("searchterm") String searchTerm) {
 		List<EmployeeEntity> searchList = employeeService.searchEmployeeLike(searchTerm);
-		if(searchList.size()> 0) {
+		if (searchList.size() > 0) {
 			return new ResponseEntity<>(searchList, HttpStatus.ACCEPTED);
+		} else {
+			return new ResponseEntity<>("Employee Not Found", HttpStatus.NOT_FOUND);
 		}
-		else {
-			return new ResponseEntity<>("Employee Not Found",HttpStatus.NOT_FOUND);
-		}
-		
+
 	}
 
 	@GetMapping("exportpdf/{page}")

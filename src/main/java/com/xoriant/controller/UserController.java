@@ -26,12 +26,12 @@ public class UserController {
 	private UserService userService;
 
 	@PostMapping("adduser")
-	public ResponseEntity<UserPOJO> add(@RequestBody @Valid UserPOJO user) {
+	public ResponseEntity<?> add(@RequestBody @Valid UserPOJO user) {
 		return new ResponseEntity<>(userService.adduser(user), HttpStatus.CREATED);
 	}
 
 	@PutMapping("updateuser")
-	public ResponseEntity<UserPOJO> updateuser(@RequestBody @Valid UserUpdatePOJO user) {
+	public ResponseEntity<?> updateuser(@RequestBody @Valid UserUpdatePOJO user) {
 		Optional<UserPOJO> userResponse = userService.updateuser(user);
 		if (userResponse.isPresent()) {
 			return new ResponseEntity<>(userResponse.get(), HttpStatus.OK);
@@ -40,7 +40,7 @@ public class UserController {
 	}
 
 	@PutMapping("updateuserroles")
-	public ResponseEntity<UserPOJO> updateUserRoles(@RequestBody @Valid UserRolesPOJO user) {
+	public ResponseEntity<?> updateUserRoles(@RequestBody @Valid UserRolesPOJO user) {
 		Optional<UserPOJO> userResponse = userService.updateUserRoles(user);
 		if (userResponse.isPresent()) {
 			return new ResponseEntity<>(userResponse.get(), HttpStatus.OK);

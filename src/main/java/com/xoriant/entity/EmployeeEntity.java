@@ -1,6 +1,7 @@
 package com.xoriant.entity;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -27,9 +28,11 @@ import lombok.Setter;
 @AllArgsConstructor
 @Entity
 @Table(name = "EMPLOYEES")
-public class EmployeeEntity {
+public class EmployeeEntity extends AuditEntity {
 
-	public EmployeeEntity(String firstName2, String lastName2, String email2, LocalDate date2) {
+	public EmployeeEntity(String createdBy, LocalDateTime createdDate, String lastUpdatedBy,
+			LocalDateTime lastUpdateDate, String firstName2, String lastName2, String email2, LocalDate date2) {
+		super(createdBy, createdDate, lastUpdatedBy, lastUpdateDate);
 		this.firstName = firstName2;
 		this.lastName = lastName2;
 		this.email = email2;

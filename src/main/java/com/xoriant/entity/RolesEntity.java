@@ -1,5 +1,7 @@
 package com.xoriant.entity;
 
+import java.time.LocalDateTime;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,7 +18,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "ROLES")
-public class RolesEntity {
+public class RolesEntity extends AuditEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +28,9 @@ public class RolesEntity {
 	@Column(name = "rolename")
 	private String roleName;
 
-	public RolesEntity(String roleName) {
+	public RolesEntity(String createdBy, LocalDateTime createdDate, String lastUpdatedBy, LocalDateTime lastUpdateDate,
+			String roleName) {
+		super(createdBy, createdDate, lastUpdatedBy, lastUpdateDate);
 		this.roleName = roleName;
 	}
 }

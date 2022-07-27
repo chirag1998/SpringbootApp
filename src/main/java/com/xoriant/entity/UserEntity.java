@@ -1,5 +1,6 @@
 package com.xoriant.entity;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,7 +25,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @Entity
 @Table(name = "USERS")
-public class UserEntity {
+public class UserEntity extends AuditEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,7 +53,9 @@ public class UserEntity {
 			CascadeType.REFRESH }, orphanRemoval = true, fetch = FetchType.EAGER)
 	private Set<AccessMappingEntity> roleMapping = new HashSet<>();
 
-	public UserEntity(String displayName, String userName, String password, String email, String mobileNumber) {
+	public UserEntity(String createdBy, LocalDateTime createdDate, String lastUpdatedBy, LocalDateTime lastUpdateDate,
+			String displayName, String userName, String password, String email, String mobileNumber) {
+		super(createdBy, createdDate, lastUpdatedBy, lastUpdateDate);
 		this.displayName = displayName;
 		this.userName = userName;
 		this.password = password;

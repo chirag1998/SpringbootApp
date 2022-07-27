@@ -1,68 +1,85 @@
 package com.xoriant.service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import com.xoriant.entity.EmployeeEntity;
-import com.xoriant.entity.UserEntity;
+import com.xoriant.pojo.EmployeePOJO;
 import com.xoriant.repository.EmployeeRepository;
 
 @Service
 public class EmployeeService {
-	
+
 	@Autowired
 	private EmployeeRepository employeeRepo;
+
+	@Autowired
+	private ModelMapper modelMapper;
 
 	public Object getUsers() {
 		return employeeRepo.findAll();
 	}
-	
-	public Page<EmployeeEntity> getpagelist(Pageable pageable){
+
+	public Page<EmployeeEntity> getpagelist(Pageable pageable) {
 		return employeeRepo.findAll(pageable);
-		 
-		
+
 	}
 
 	public void deleteById(long id) {
 		employeeRepo.deleteById(id);
-		
+
 	}
 
-	public EmployeeEntity adduser(EmployeeEntity employee) {
-		employeeRepo.save(employee);
-		EmployeeEntity result = new EmployeeEntity(employee.getFirstName(), employee.getLastName(), employee.getEmail(), employee.getDate());
-		return result;
+	public EmployeePOJO adduser(EmployeePOJO employeepojo) {
+
+		String loggeduser = userName();
+		EmployeeEntity employee = new EmployeeEntity(loggeduser, LocalDateTime.now(), loggeduser, LocalDateTime.now(),
+				employeepojo.getFirstName(), employeepojo.getLastName(), employeepojo.getEmail(),
+				employeepojo.getDate());
+		EmployeeEntity employeentity = employeeRepo.save(employee);
+		EmployeePOJO responseEntity = mapToPojo(employeentity);
+		return responseEntity;
 	}
 
-	public EmployeeEntity updateEmployee(long id, EmployeeEntity emp) {
+	public EmployeePOJO updateEmployee(long id, EmployeePOJO emppojo) {
 		EmployeeEntity employee = employeeRepo.findById(id).get();
-		if(emp.getFirstName() != null && !"".equalsIgnoreCase(emp.getFirstName())) {
-			employee.setFirstName(emp.getFirstName());
+		String loggedInUser = userName();
+		if (employee != null) {
+			employee.setFirstName(emppojo.getFirstName());
+			employee.setLastName(emppojo.getLastName());
+			employee.setEmail(emppojo.getEmail());
+			employee.setDate(emppojo.getDate());
+			employee.setLastUpdateDate(LocalDateTime.now());
+			employee.setLastUpdatedBy(loggedInUser);
 		}
-		if(emp.getLastName() != null && !"".equalsIgnoreCase(emp.getLastName())) {
-			employee.setLastName(emp.getLastName());
-		}
-		if(emp.getEmail() != null && !"".equalsIgnoreCase(emp.getEmail())) {
-			employee.setEmail(emp.getEmail());
-		}
-		if(emp.getDate() != null) {
-			employee.setDate(emp.getDate());
-		}
-		
-		return employeeRepo.save(employee);
+		EmployeeEntity employeentity = employeeRepo.save(employee);
+		EmployeePOJO responseEntity = mapToPojo(employeentity);
+		return responseEntity;
+	}
+
+	private EmployeePOJO mapToPojo(EmployeeEntity user) {
+		return modelMapper.map(user, EmployeePOJO.class);
 	}
 
 	public List<EmployeeEntity> searchEmployee(String searchterm) {
-		List<EmployeeEntity> searchlist= employeeRepo.findByFirstName(searchterm);
+		List<EmployeeEntity> searchlist = employeeRepo.findByFirstName(searchterm);
 		return searchlist;
-		
+
 	}
-	
-	public List<EmployeeEntity> searchEmployeeLike(String query){
+
+	public String userName() {
+		return ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
+	}
+
+	public List<EmployeeEntity> searchEmployeeLike(String query) {
 		List<EmployeeEntity> list = employeeRepo.searchEmployee(query);
 		return list;
 	}

@@ -14,9 +14,6 @@ import lombok.Setter;
 public class RolesPOJO {
 
 	@NotNull
-	private String username;
-
-	@NotNull
-	private String[] roles;
+	private String roleName;
 
 }
