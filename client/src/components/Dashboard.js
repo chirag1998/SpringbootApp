@@ -84,7 +84,7 @@ function DashboardContent() {
   React.useEffect(() => {
     setroles(location.state.roles)
     //console.log(location.state.roles,"roles");
-  },)
+  },[location.state.roles])
   
 
   return (
@@ -168,7 +168,7 @@ function DashboardContent() {
             <Grid container spacing={3} >
               <Grid item xs={12} >
                 <Paper sx={{ p: 2, display: 'flex', flexDirection: 'column', height:'100%'}}>
-                  <DataTable />
+                  <DataTable roles={roles}/>
                 </Paper>
               </Grid>
             </Grid>

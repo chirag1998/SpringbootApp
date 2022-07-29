@@ -100,7 +100,7 @@ public class EmployeeController {
 		String headerValue = "attachment; filename=Employees_" + currentDateTime + ".pdf";
 		response.setHeader(headerKey, headerValue);
 
-		Pageable of = PageRequest.of(page, 5);
+		Pageable of = PageRequest.of(page, 6);
 		Page<EmployeeEntity> empPageList = employeeService.getpagelist(of);
 		List<EmployeeEntity> result = empPageList.getContent();
 		EmployeePdfExporterUtil exporter = new EmployeePdfExporterUtil(result);

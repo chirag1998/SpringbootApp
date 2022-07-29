@@ -6,12 +6,13 @@ import DashboardIcon from '@mui/icons-material/Dashboard';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import LayersIcon from '@mui/icons-material/Layers';
 import ListAltIcon from '@mui/icons-material/ListAlt';
+import { useNavigate } from 'react-router-dom';
 
 
 
 export default function Listitems1({roles}) {
 
-    
+    let navigate = useNavigate();
 
     const [role, setrole] = React.useState([]);
 
@@ -37,7 +38,7 @@ export default function Listitems1({roles}) {
                 </ListItemIcon>
                 <ListItemText primary="Tab 1" />
             </ListItemButton>
-            <ListItemButton>
+            <ListItemButton onClick={() => navigate('/tab2')}>
                 <ListItemIcon>
                     <BarChartIcon />
                 </ListItemIcon>
