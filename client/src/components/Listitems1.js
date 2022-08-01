@@ -15,37 +15,52 @@ export default function Listitems1({roles}) {
     let navigate = useNavigate();
 
     const [role, setrole] = React.useState([]);
+    const [selectedIndex, setSelectedIndex] = React.useState(0)
 
     React.useEffect(() => {
       //console.log("from list", roles)
       setrole(roles);
     }, [roles])
 
-    
+
+    React.useEffect(()=>{
+        switch (window.location.pathname) {
+            case "/datatable":
+              setSelectedIndex(0)
+              break
+            case "/employeedetail":
+              setSelectedIndex(2)
+              break
+            default:
+              break
+          }
+    })
+
+
     
     return (
         <React.Fragment>
             {/* <ListItemButton onClick={() => navigate(`add-employee`)}> */}
-            <ListItemButton>
+            <ListItemButton onClick={() => navigate('/datatable', {state:{roles:role}})} selected={selectedIndex === 0}>
                 <ListItemIcon>
                     <DashboardIcon />
                 </ListItemIcon>
-                <ListItemText primary="Dashboard" />
+                <ListItemText primary="Datatable" />
             </ListItemButton>
-            <ListItemButton>
+            <ListItemButton selected={selectedIndex === 1}>
                 <ListItemIcon>
                     <ListAltIcon />
                 </ListItemIcon>
                 <ListItemText primary="Tab 1" />
             </ListItemButton>
-            <ListItemButton onClick={() => navigate('/tab2')}>
+            <ListItemButton onClick={() => navigate('/employeedetail', {state:{roles:role}})} selected={selectedIndex === 2}>
                 <ListItemIcon>
                     <BarChartIcon />
                 </ListItemIcon>
                 <ListItemText primary="Tab 2" />
             </ListItemButton>
             {role.includes('Admin') &&
-            <ListItemButton>
+            <ListItemButton selected={selectedIndex === 3}>
                 <ListItemIcon>
                     <LayersIcon />
                 </ListItemIcon>

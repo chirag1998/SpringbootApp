@@ -19,7 +19,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class EmployeePOJO {
-
+	
+	private long id;
 	private String firstName;
 	private String lastName;
 	@NotNull

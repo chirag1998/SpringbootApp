@@ -1,17 +1,31 @@
 import React from 'react';
-import { Routes,Route } from 'react-router-dom';
+import { Routes, Route, Outlet } from 'react-router-dom';
 import './App.css';
-import DashboardContent from './components/Dashboard';
+import DataTable from './components/Datatable';
+import Drawer1 from './components/Drawer';
 import SignIn from './components/SignIn';
 import SignUp from './components/SignUp';
+import EmployeeDetail from './components/EmployeeDetail';
 
 function App() {
+
+  const SidebarLayout = () => (
+    <>
+      <Drawer1 />
+      <Outlet />
+    </>
+  );
+
   return (
-    <div className="App">
+    <div className="App" style={{display: 'flex'}}>
       <Routes>
-        <Route path = "/" element = { <SignIn />}></Route>
-        <Route path ='/dashboard' element ={<DashboardContent/>}></Route>
-        <Route path ='/signup' element ={<SignUp/>}></Route>
+        <Route element={<SidebarLayout />}>
+          <Route path="/datatable" element={<DataTable />} />
+          <Route path="/employeedetail" element={<EmployeeDetail />} />
+        </Route>
+        <Route path="/" element={<SignIn />}></Route>
+        {/* <Route path ='/dashboard' element ={<DashboardContent/>}></Route> */}
+        <Route path='/signup' element={<SignUp />}></Route>
       </Routes>
     </div>
   );

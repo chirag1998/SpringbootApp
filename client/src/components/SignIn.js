@@ -61,7 +61,7 @@ export default function SignIn() {
             JSON.stringify("LoginToken " + response?.data?.jwtToken)
           );
           //console.log(response.data.roles);
-          navigate("/dashboard", {state:{roles:response.data.roles}});
+          navigate("/datatable", {state:{roles:response.data.roles}});
           // }
         })
         .catch((error) => {
