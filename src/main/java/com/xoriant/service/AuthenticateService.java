@@ -22,7 +22,10 @@ import com.xoriant.pojo.AuthenticationResponsePOJO;
 import com.xoriant.repository.UserRepository;
 import com.xoriant.util.JwtUtil;
 
+import lombok.extern.slf4j.Slf4j;
+
 @Service
+@Slf4j
 public class AuthenticateService implements UserDetailsService {
 
 	@Autowired
@@ -69,7 +72,7 @@ public class AuthenticateService implements UserDetailsService {
 		 * org.springframework.security.core.userdetails.User("xorpay", "xorpay", new
 		 * ArrayList<>()); }
 		 */ else {
-			System.out.println("User not found with username:{} " + username);
+			log.info("User not found with username:{} " + username);
 			throw new UsernameNotFoundException("User not found with username: " + username);
 		}
 	}

@@ -19,8 +19,10 @@ import com.xoriant.service.AuthenticateService;
 import com.xoriant.util.JwtUtil;
 
 import io.jsonwebtoken.ExpiredJwtException;
+import lombok.extern.slf4j.Slf4j;
 
 @Component
+@Slf4j
 public class RbacRequestFilter extends OncePerRequestFilter {
 
 	@Autowired
@@ -44,13 +46,13 @@ public class RbacRequestFilter extends OncePerRequestFilter {
 			try {
 				username = jwtUtil.getUsernameFromToken(jwtToken);
 			} catch (IllegalArgumentException e) {
-				System.out.println("Unable to get JWT Token");
+				log.info("Unable to get JWT Token");
 			} catch (ExpiredJwtException e) {
-				System.out.println("JWT Token has expired");
+				log.info("JWT Token has expired");
 			}
 		} else {
-			logger.warn(requestTokenHeader);
-			logger.warn("JWT Token does not begin with LoginToken String");
+			log.warn(requestTokenHeader);
+			log.warn("JWT Token does not begin with LoginToken String");
 		}
 
 		// Once we get the token validate it.
