@@ -41,7 +41,16 @@ public class AuthenticateService implements UserDetailsService {
 		String userName = request.getUserName();
 
 		UserDetails userDetails = loadUserByUsername(userName);
-		String token = jwtUtil.generateToken(userDetails);
+		Authentication authentication = null;
+		try {
+			authentication = authenticationManager
+					.authenticate(new UsernamePasswordAuthenticationToken(userName, request.getUserPassword()));
+			SecurityContextHolder.getContext().setAuthentication(authentication);
+		} catch (BadCredentialsException | DisabledException e) {
+			log.error("Authentication failed " + e.toString());
+			throw e;
+		}
+		String token = jwtUtil.generateToken(authentication);
 		UserEntity authenticatedUser = userDao.findByUserName(userName);
 		AuthenticationResponsePOJO response = new AuthenticationResponsePOJO(token,
 				getRoles(authenticatedUser.getRoleMapping()));
