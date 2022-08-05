@@ -45,7 +45,7 @@ export default function DataTable() {
       field: 'email', headerName: 'E-Mail', flex: 1, minWidth: 230
     },
     {
-      field: 'date', headerName: 'Date', flex: 1,
+      field: 'date', headerName: 'Date of Joining', flex: 1,
 
     },
     {
@@ -75,6 +75,7 @@ export default function DataTable() {
   ];
 
   const onChange = (e) => {
+    console.log(e.target.id)
     const { value, id } = e.target
     setFormData({ ...formData, [id]: value })
   }
@@ -201,8 +202,8 @@ export default function DataTable() {
   }
 
   const handleClick = (cellValues) => {
-    const{createdBy, createdDate, lastUpdateDate, lastUpdatedBy, ...newCellValues} = cellValues
-    setFormData(newCellValues);
+    //const{createdBy, createdDate, lastUpdateDate, lastUpdatedBy, ...newCellValues} = cellValues
+    setFormData(cellValues);
     handleClickOpen();
   }
 

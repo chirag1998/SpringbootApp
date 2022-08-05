@@ -1,6 +1,7 @@
 package com.xoriant.service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
@@ -28,8 +29,11 @@ public class EmployeeService {
 		return employeeRepo.findAll();
 	}
 
-	public Page<EmployeeEntity> getpagelist(Pageable pageable) {
-		return employeeRepo.findAll(pageable);
+	public Page<EmployeePOJO> getpagelist(Pageable pageable) {
+		Page<EmployeeEntity> entitypage= employeeRepo.findAll(pageable);
+		Page<EmployeePOJO> pojopage = pageMapTOpojo(entitypage);
+		
+		return pojopage;
 
 	}
 
@@ -68,6 +72,10 @@ public class EmployeeService {
 	private EmployeePOJO mapToPojo(EmployeeEntity user) {
 		return modelMapper.map(user, EmployeePOJO.class);
 	}
+	
+	private Page<EmployeePOJO> pageMapTOpojo(Page<EmployeeEntity> entitypage){
+		return entitypage.map(entityObject -> modelMapper.map(entityObject, EmployeePOJO.class));	
+	}
 
 	public List<EmployeeEntity> searchEmployee(String searchterm) {
 		List<EmployeeEntity> searchlist = employeeRepo.findByFirstName(searchterm);
@@ -79,9 +87,16 @@ public class EmployeeService {
 		return ((UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal()).getUsername();
 	}
 
-	public List<EmployeeEntity> searchEmployeeLike(String query) {
+	public List<EmployeePOJO> searchEmployeeLike(String query) {
 		List<EmployeeEntity> list = employeeRepo.searchEmployee(query);
-		return list;
+		List<EmployeePOJO> pojolist = listMapTOpojo(list);
+		return pojolist;
+	}
+	
+	private List<EmployeePOJO> listMapTOpojo(List<EmployeeEntity> entitypage){
+		List<EmployeePOJO> pojo = new ArrayList<>();
+		entitypage.forEach(emppojoobj -> pojo.add(modelMapper.map(emppojoobj, EmployeePOJO.class)));
+		return pojo;
 	}
 	public EmployeeEntity searchEmployeeById(long id) {
 		EmployeeEntity emp= employeeRepo.findById(id).get();

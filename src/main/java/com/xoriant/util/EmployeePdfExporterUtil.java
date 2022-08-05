@@ -17,11 +17,12 @@ import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import com.xoriant.entity.EmployeeEntity;
+import com.xoriant.pojo.EmployeePOJO;
 
 public class EmployeePdfExporterUtil {
-	private List<EmployeeEntity> listEmployees;
+	private List<EmployeePOJO> listEmployees;
 
-	public EmployeePdfExporterUtil(List<EmployeeEntity> listEmployees) {
+	public EmployeePdfExporterUtil(List<EmployeePOJO> listEmployees) {
 		this.listEmployees = listEmployees;
 	}
 
@@ -50,7 +51,7 @@ public class EmployeePdfExporterUtil {
 	}
 
 	private void writeTableData(PdfPTable table) {
-		for (EmployeeEntity user : listEmployees) {
+		for (EmployeePOJO user : listEmployees) {
 			table.addCell(String.valueOf(user.getId()));
 			table.addCell(user.getFirstName());
 			table.addCell(user.getLastName());

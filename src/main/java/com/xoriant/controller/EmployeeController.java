@@ -61,7 +61,7 @@ public class EmployeeController {
 	@GetMapping("pagablelist/{page}")
 	public ResponseEntity<?> pagablelist(@PathVariable("page") int page) {
 		Pageable of = PageRequest.of(page, 6);
-		Page<EmployeeEntity> empPageList = employeeService.getpagelist(of);
+		Page<EmployeePOJO> empPageList = employeeService.getpagelist(of);
 		return new ResponseEntity<>(empPageList, HttpStatus.OK);
 
 	}
@@ -80,7 +80,7 @@ public class EmployeeController {
 
 	@GetMapping("likesearch/{searchterm}")
 	public ResponseEntity<?> searchLike(@PathVariable("searchterm") String searchTerm) {
-		List<EmployeeEntity> searchList = employeeService.searchEmployeeLike(searchTerm);
+		List<EmployeePOJO> searchList = employeeService.searchEmployeeLike(searchTerm);
 		if (searchList.size() > 0) {
 			return new ResponseEntity<>(searchList, HttpStatus.ACCEPTED);
 		} else {
@@ -101,8 +101,8 @@ public class EmployeeController {
 		response.setHeader(headerKey, headerValue);
 
 		Pageable of = PageRequest.of(page, 6);
-		Page<EmployeeEntity> empPageList = employeeService.getpagelist(of);
-		List<EmployeeEntity> result = empPageList.getContent();
+		Page<EmployeePOJO> empPageList = employeeService.getpagelist(of);
+		List<EmployeePOJO> result = empPageList.getContent();
 		EmployeePdfExporterUtil exporter = new EmployeePdfExporterUtil(result);
 		exporter.export(response);
 
@@ -118,5 +118,6 @@ public class EmployeeController {
 		List<EmployeeEntity> empList = employeeService.getAll();
 
 		return new ResponseEntity<>(empList, HttpStatus.ACCEPTED);
+		
 	}
 }
