@@ -107,4 +107,16 @@ public class EmployeeController {
 		exporter.export(response);
 
 	}
+	@GetMapping("searchbyid/{id}")
+	public ResponseEntity<?> searchById(@PathVariable("id") long id) {
+		EmployeeEntity searchList = employeeService.searchEmployeeById(id);
+
+		return new ResponseEntity<>(searchList, HttpStatus.ACCEPTED);
+	}
+	@GetMapping("getallemployees")
+	public ResponseEntity<?> getAllEmployees() {
+		List<EmployeeEntity> empList = employeeService.getAll();
+
+		return new ResponseEntity<>(empList, HttpStatus.ACCEPTED);
+	}
 }

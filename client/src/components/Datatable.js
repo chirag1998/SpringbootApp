@@ -9,6 +9,7 @@ import CustomSnackbar from './CustomSnackbar';
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import CustomExport from './CustomExport';
 import { Link, useLocation } from 'react-router-dom';
+import EmployeeActionsMenu from './EmployeeActionsMenu';
 
 const DATA_LIST_URL = "http://localhost:8080/";
 const ADD_DATA = "http://localhost:8080/addemployee";
@@ -48,12 +49,13 @@ export default function DataTable() {
 
     },
     {
-      field: 'edit', headerName: 'Edit', sortable: false,
+      field: 'edit', headerName: 'Actions', sortable: false,
       renderCell: (cellValues) => {
         return (
-          <IconButton
-            onClick={() => handleClick(cellValues.row)}><EditIcon /></IconButton>
+          // <IconButton
+          //   onClick={() => handleClick(cellValues.row)}><EditIcon /></IconButton>
           //<FormDialog />
+          <EmployeeActionsMenu handleClick={handleClick} handleDelete={handleDelete} data={cellValues.row} roles={role}/>
         );
       },
       flex: 1
@@ -100,11 +102,13 @@ export default function DataTable() {
 
   const handleFormSubmit = (event) => {
     event.preventDefault();
+    console.log(formData);
     //setFormErrors(validate(formData))
     let errorObj = validate(formData);
     setFormErrors(errorObj);
     console.log(formErrors);
     if (Object.keys(errorObj).length === 0) {
+
       let lt = localStorage.getItem("accessToken");
       if (formData.id) {
         axios.put(DATA_LIST_URL + 'update/' + formData.id, formData, {
@@ -132,6 +136,7 @@ export default function DataTable() {
         setFormData(initialValue);
       }
       else {
+        console.log(formData)
         axios.post(ADD_DATA, formData, {
           headers: {
             Authorization: JSON.parse(lt)

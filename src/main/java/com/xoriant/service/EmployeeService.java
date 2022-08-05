@@ -83,5 +83,14 @@ public class EmployeeService {
 		List<EmployeeEntity> list = employeeRepo.searchEmployee(query);
 		return list;
 	}
-
+	public EmployeeEntity searchEmployeeById(long id) {
+		EmployeeEntity emp= employeeRepo.findById(id).get();
+		return emp;
+		
+	}
+	public List<EmployeeEntity> getAll() {
+		List<EmployeeEntity> empList = employeeRepo.findAll();
+		return empList;
+		
+	}
 }
