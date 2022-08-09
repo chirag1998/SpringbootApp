@@ -1,18 +1,7 @@
 import {
-  Box,
-  Button,
-  Checkbox,
-  Container,
-  FormControl,
-  FormControlLabel,
-  FormGroup,
-  FormLabel,
-  Grid,
-  Radio,
-  RadioGroup,
-  TextField,
-  Toolbar,
-  Typography,
+  Box, Button, Checkbox, Container, FormControl,
+  FormControlLabel, FormGroup, FormLabel, Grid, Radio,
+  RadioGroup, TextField, Toolbar, Typography,
 } from "@mui/material";
 
 import React, { useEffect, useState } from "react";
@@ -23,36 +12,41 @@ import Select from "react-select";
 import countryList from "react-select-country-list";
 import { useMemo } from "react";
 import { DesktopDatePicker } from "@mui/x-date-pickers";
+import axios from "axios";
 const initialValues = {
   mobile: "",
   dob: "",
-  fgender: "female",
-  fhobbies: [],
+  gender: "female",
+  hobby: "",
   country: "",
-  profile: null,
 };
+
+const ADD_BASIC_DETAILS = "http://localhost:8080/basicdetails";
+const GET_BASIC_DETAILS = "http://localhost:8080/getbasicdetails/";
 
 export default function BasicDetails() {
   let location = useLocation();
   const [data, setdata] = useState({});
-
-  const [date, setDate] = React.useState(new Date().toLocaleDateString());
-
+  const [date, setDate] = React.useState(new Date().toISOString().slice(0, 10));
   const [nation, setNation] = useState("");
+  const [fgender, setFgender] = useState("female");
   const options = useMemo(() => countryList().getData(), []);
-
   const [image, setimage] = useState(null);
-  // const [gender, setGender] = useState("female");
-  const [formData, setFormData] = useState(initialValues);
-  const { mobile, dob, fgender, fhobbies, country, profile } = formData;
+  const [profile_image, setprofile_image] = useState(null);
+  const [formData, setFormData] = useState({});
+  const { mobile, dob, gender, hobby, country } = formData;
+  const [hobbies, setHobbies] = React.useState({
+    trading: false,
+    coding: false,
+    design: false,
+    reading: false,
+  });
+  const { trading, coding, design, reading } = hobbies;
+
 
   const uploadHandler = (e) => {
-    console.log("uploaded &&&&&s");
     setimage(URL.createObjectURL(e.target.files[0]));
-    setFormData({
-      ...formData,
-      profile: URL.createObjectURL(e.target.files[0]),
-    });
+    setprofile_image(e.target.files[0])
   };
 
   const dropHandler = (newValue) => {
@@ -61,34 +55,31 @@ export default function BasicDetails() {
   };
 
   const handleDateChange = (newValue) => {
-    setDate(newValue);
-    setFormData({ ...formData, dob: newValue });
+    setDate(newValue.toISOString().slice(0, 10));
+    setFormData({ ...formData, dob: newValue.toISOString().slice(0, 10) });
   };
   const handleGenderChange = (event) => {
-    // setGender(event.target.value);
-    setFormData({ ...formData, fgender: event.target.value });
+    setFgender(event.target.value)
+    setFormData({ ...formData, gender: event.target.value });
   };
-
-  const [hobbies, setHobbies] = React.useState({
-    trading: false,
-    coding: false,
-    design: false,
-    reading: false,
-  });
 
   const handleChange = (event) => {
     setHobbies({
       ...hobbies,
       [event.target.name]: event.target.checked,
     });
-    setFormData({ ...formData, fhobbies: hobbies });
+    setfhobbies();
   };
 
-  const { trading, coding, design, reading } = hobbies;
+  const setfhobbies = () => {
+    console.log(hobbies)
+    let keys = Object.keys(hobbies);
 
-  useEffect(() => {
-    setdata(location.state.data);
-  }, []);
+    let filtered = keys.filter(function (key) {
+      return hobbies[key]
+    });
+    setFormData({ ...formData, hobby: filtered.toString() })
+  }
 
   const onChange = (e) => {
     console.log(e.target.id);
@@ -96,10 +87,75 @@ export default function BasicDetails() {
     setFormData({ ...formData, [id]: value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log(formData);
+    let totaldata = new FormData();
+    totaldata.append('employeedata', JSON.stringify(formData));
+    totaldata.append('profile', profile_image)
+    for (var value of totaldata.values()) {
+      console.log(value);
+    }
+    let lt = localStorage.getItem("accessToken");
+    try {
+      const response = await axios.post(ADD_BASIC_DETAILS, totaldata, {
+        headers: {
+
+          Authorization: JSON.parse(lt)
+        }
+      })
+      console.log(response)
+      setFormData(initialValues);
+      setimage(null);
+      setHobbies({ trading: false, coding: false, design: false, reading: false, })
+    } catch (e) {
+      console.log(e);
+    }
   };
+
+  const getBasicDetails = async () => {
+    let lt = localStorage.getItem("accessToken");
+    let x = location.state.data.id;
+    try {
+      const response = await axios.get(GET_BASIC_DETAILS + x, {
+        headers: {
+          Authorization: JSON.parse(lt)
+        }
+      })
+      if (response.status === 200) {
+        console.log(response.data)
+        setDate(response.data.dob)
+        setFormData({ ...formData, mobile: response.data.mobile, gender: response.data.gender })
+        setNation(response.data.country)
+        setFgender(response.data.gender)
+        const nat = options.filter(val => val.label === response.data.country)
+        setNation(nat[0])
+        const subhobby = response.data.hobby
+        if (subhobby.includes('trading')) {
+          setHobbies({ ...hobbies, trading: true })
+        }
+        if (subhobby.includes('coding')) {
+          setHobbies({ ...hobbies, coding: true })
+        }
+        if (subhobby.includes('design')) {
+          setHobbies({ ...hobbies, design: true })
+        }
+        if (subhobby.includes('reading')) {
+          setHobbies({ ...hobbies, reading: true })
+        }
+        setimage(`data:image/jpeg;base64,${response.data.profile}`)
+      }
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
+  useEffect(() => {
+    setdata(location.state.data);
+    setFormData({ ...formData, empId: location.state.data.id })
+    getBasicDetails();
+  }, []);
+
+
   return (
     <>
       <Box
@@ -202,7 +258,7 @@ export default function BasicDetails() {
                   <LocalizationProvider dateAdapter={AdapterDateFns}>
                     <DesktopDatePicker
                       label="DOB"
-                      inputFormat="MM-dd-yyyy"
+                      inputFormat="dd/MM/yyyy"
                       value={date}
                       onChange={handleDateChange}
                       renderInput={(params) => <TextField {...params} />}

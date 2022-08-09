@@ -8,24 +8,35 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lowagie.text.DocumentException;
 import com.xoriant.entity.EmployeeEntity;
+import com.xoriant.entity.EmployeePersonalDetails;
 import com.xoriant.pojo.EmployeePOJO;
+import com.xoriant.service.EmployeePersonalDetailsService;
 import com.xoriant.service.EmployeeService;
 import com.xoriant.util.EmployeePdfExporterUtil;
 
@@ -35,6 +46,12 @@ public class EmployeeController {
 
 	@Autowired
 	private EmployeeService employeeService;
+	
+	@Autowired
+	private EmployeePersonalDetailsService employeePersonalDetailsService;
+	
+	@Autowired
+	private ModelMapper modelMapper;
 
 	@PostMapping("/addemployee")
 	public ResponseEntity<?> addEmployee(@RequestBody EmployeePOJO employee) {
@@ -107,17 +124,52 @@ public class EmployeeController {
 		exporter.export(response);
 
 	}
+	
+	
 	@GetMapping("searchbyid/{id}")
 	public ResponseEntity<?> searchById(@PathVariable("id") long id) {
 		EmployeeEntity searchList = employeeService.searchEmployeeById(id);
-
 		return new ResponseEntity<>(searchList, HttpStatus.ACCEPTED);
 	}
+	
+	
 	@GetMapping("getallemployees")
 	public ResponseEntity<?> getAllEmployees() {
 		List<EmployeeEntity> empList = employeeService.getAll();
-
 		return new ResponseEntity<>(empList, HttpStatus.ACCEPTED);
-		
 	}
+	
+	@PostMapping(value = {"basicdetails"}, consumes = {MediaType.MULTIPART_FORM_DATA_VALUE,MediaType.APPLICATION_JSON_VALUE})
+	public ResponseEntity<?> employeeBasicDetails(@RequestPart("employeedata") String employee,
+			@RequestPart("profile") MultipartFile file) {
+		EmployeePersonalDetails emp = new EmployeePersonalDetails();
+		ObjectMapper objectMapper = new ObjectMapper();
+		
+		try {
+			emp= objectMapper.readValue(employee, EmployeePersonalDetails.class);
+		} catch (JsonMappingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		} catch (JsonProcessingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		try {
+			byte[] image = file.getBytes();
+			
+			emp.setProfile(image);
+			System.out.println("gjhg "+emp);
+		} catch (IOException e) {
+			
+			e.printStackTrace();
+		}
+		return new ResponseEntity<>(employeePersonalDetailsService.addBBasicDetails(emp), HttpStatus.CREATED);
+	}
+	
+	
+	@GetMapping(value = "getbasicdetails/{id}")
+	public ResponseEntity<?> getBasicDetails(@PathVariable("id") long id){
+		return new ResponseEntity<>(employeePersonalDetailsService.getBasicDetails(id), HttpStatus.OK);
+	}
+	
 }

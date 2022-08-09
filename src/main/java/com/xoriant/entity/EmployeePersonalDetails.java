@@ -1,12 +1,15 @@
 package com.xoriant.entity;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Lob;
 import javax.persistence.OneToOne;
 import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
@@ -29,19 +32,16 @@ import lombok.Setter;
 public class EmployeePersonalDetails{
 	
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "emp_id")
 	Long empId;
 	
-	@OneToOne
+	@OneToOne(mappedBy = "employeePersonalDetails", fetch = FetchType.LAZY)
 	@PrimaryKeyJoinColumn(name = "emp_id")
 	EmployeeEntity employee;
 	
 	@Column(name = "mobile_no")
 	String mobile;
 	
-	@Column(name = "job_title")
-	String jobTitle;
 	
 	@Column(name= "gender")
 	String gender;
@@ -50,5 +50,16 @@ public class EmployeePersonalDetails{
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	@JsonDeserialize(using = LocalDateDeserializer.class)
 	@JsonSerialize(using = LocalDateSerializer.class)
-	LocalDate date;
+	LocalDate dob;
+	
+	@Column(name = "country")
+	String country;
+	
+	@Column(name = "hobbies")
+	String hobby;
+	
+	@Lob
+	@Column(name = "profile_image")
+	byte[] profile;	
+	
 }

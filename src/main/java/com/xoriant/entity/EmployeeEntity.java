@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -62,7 +63,8 @@ public class EmployeeEntity extends AuditEntity {
 	@JsonSerialize(using = LocalDateSerializer.class)
 	private LocalDate date;
 	
-	@OneToOne(mappedBy = "employee", cascade = CascadeType.ALL)
+	//@OneToOne(mappedBy = "employee", cascade = CascadeType.ALL,fetch = FetchType.LAZY)
+	@OneToOne(fetch = FetchType.LAZY)
 	EmployeePersonalDetails employeePersonalDetails;
 
 }
